@@ -1,79 +1,49 @@
-import React, { useEffect, useState } from "react";
-import { Box, useToast } from "native-base";
-import { Button, HStack, Text, VStack } from "native-base";
+import React, { useState } from 'react';
+import { Box, Text, VStack } from 'native-base';
 
-interface AwardsProps {}
+interface Awards {
+  title: string;
+  description: string;
+  date: string;
+  points: number;  // Armazenar a pontuação junto com a conquista
+}
 
-const Awards: React.FC<AwardsProps> = () => {
-  const [mlSize, setMlSize] = useState<number>(250);
-  const [waterAmount, setWaterAmount] = useState<number>(0);
-  const [goal, setGoal] = useState<number>(2000);
+const Awards: React.FC = () => {
+  const [achievements, setAchievements] = useState<Awards[]>([]);
 
-  const toast = useToast();
-
-  const handleWater = () => {
-    setWaterAmount(waterAmount + mlSize);
-    toast.show({
-      description: `Você comeu ${mlSize}ml de água.`,
-    });
+  const addAchievement = (title: string, description: string, points: number) => {
+    const newAchievement = {
+      title,
+      description,
+      date: new Date().toLocaleString(),
+      points,
+    };
+    setAchievements((prevAchievements: any) => [...prevAchievements, newAchievement]);
   };
-
-  const handleChangeMlSize = (size: number) => {
-    setMlSize(size);
-  };
-
-  useEffect(() => {
-    if (waterAmount >= goal) {
-      toast.show({
-        description: "A meta de comida foi atiginda. Parabéns!.",
-        placement: "top",
-      });
-    }
-  }, [waterAmount]);
 
   return (
-    <>
-      <VStack
-        flex={1}
-        width="100%"
-        justifyContent="space-between"
-        alignItems="center"
-        p={4}
-        my={30}
-      >
-        <Text fontSize="sm"> corre krl {mlSize}</Text>
-
-        <VStack>
-          <HStack alignItems="center" justifyContent="center">
-            <Text fontSize="6xl">{waterAmount}</Text>
-            <Text fontSize="xl"> / {goal}</Text>
-          </HStack>
-          <Button
-            mt={5}
-            colorScheme="primary"
-            onPress={() => {
-              handleWater();
-            }}
+    <VStack flex={1} alignItems="center" justifyContent="center" p={4}>
+      <Text fontSize="2xl" mb={4}>Conquistas</Text>
+      {achievements.length === 0 ? (
+        <Text fontSize="md">Você ainda não completou nenhum desafio!</Text>
+      ) : (
+        achievements.map((achievement, index) => (
+          <Box
+            key={index}
+            backgroundColor="#E2E8F0"
+            borderRadius="xl"
+            padding="3"
+            width="300px"
+            mb={4}
           >
-            corre forest
-          </Button>
-        </VStack>
-
-        <Box mt={10}>
-          <Button.Group>
-            <Button onPress={() => handleChangeMlSize(250)} colorScheme="teal">
-              boraaaa
-            </Button>
-            <Button onPress={() => handleChangeMlSize(350)} colorScheme="teal">
-              vamooo
-            </Button>
-            <Button onPress={() => handleChangeMlSize(500)} colorScheme="teal">
-              oxi
-            </Button>
-          </Button.Group>
-        </Box>
-      </VStack>
-    </>
+            <Text fontSize="xl">{achievement.title}</Text>
+            <Text fontSize="md">{achievement.description}</Text>
+            <Text fontSize="sm" color="gray.500">{achievement.date}</Text>
+            <Text fontSize="md" color="green.500">+{achievement.points} pontos</Text> {/* Exibe a pontuação */}
+          </Box>
+        ))
+      )}
+    </VStack>
   );
 };
 
