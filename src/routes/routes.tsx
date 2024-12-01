@@ -3,10 +3,9 @@ import Step from "../screens/Step";
 import Vita from "../screens/Vita";
 import Water from "../screens/Water";
 import Awards from "../screens/Awards";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { View, Text } from "native-base";
+import { Feather, FontAwesome } from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
-import { Feather } from "@expo/vector-icons";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 const Tab = createBottomTabNavigator();
 
@@ -21,6 +20,7 @@ export function Routes() {
             tabBarIcon: ({ color }) => (
               <Feather name="home" size={24} color={color} />
             ),
+            tabBarLabel: () => null,
             headerShown: false,
           }}
         />
@@ -31,6 +31,7 @@ export function Routes() {
             tabBarIcon: ({ color }) => (
               <Feather name="droplet" size={24} color={color} />
             ),
+            tabBarLabel: () => null,
           }}
         />
         <Tab.Screen
@@ -38,8 +39,9 @@ export function Routes() {
           component={Food}
           options={{
             tabBarIcon: ({ color }) => (
-              <Feather name="menu" size={24} color={color} />
+              <FontAwesome name="lemon-o" size={24} color={color} />
             ),
+            tabBarLabel: () => null,
           }}
         />
         <Tab.Screen
@@ -49,6 +51,7 @@ export function Routes() {
             tabBarIcon: ({ color }) => (
               <Feather name="activity" size={24} color={color} />
             ),
+            tabBarLabel: () => null,
           }}
         />
         <Tab.Screen
@@ -56,8 +59,9 @@ export function Routes() {
           component={Awards}
           options={{
             tabBarIcon: ({ color }) => (
-              <Feather name="star" size={24} color={color} />
+              <Feather name="award" size={24} color={color} />
             ),
+            tabBarLabel: () => null,
           }}
         />
       </Tab.Navigator>
