@@ -1,80 +1,103 @@
+import { Box, useToast, View } from "native-base";
 import React, { useEffect, useState } from "react";
-import { Box, useToast } from "native-base";
+import { Animated, ImageBackground, StyleSheet, Dimensions } from "react-native";
 import { Button, HStack, Text, VStack } from "native-base";
 
 interface VitaProps {}
 
 const Vita: React.FC<VitaProps> = () => {
-  const [mlSize, setMlSize] = useState<number>(250);
-  const [waterAmount, setWaterAmount] = useState<number>(0);
-  const [goal, setGoal] = useState<number>(2000);
+  const [mood, setMood] = useState("happy");
+  const [steps, setSteps] = useState(0);
 
-  const toast = useToast();
+  const petImage =
+    mood === "happy"
+      ? require("../../assets/monstro_child_happy.png")
+      : require("../../assets/monstro_child.png");
 
-  const handleWater = () => {
-    setWaterAmount(waterAmount + mlSize);
-    toast.show({
-      description: `Você comeu ${mlSize}ml de água.`,
-    });
+  // Pegando a largura da tela
+  const screenWidth = Dimensions.get("window").width;
+
+  // Estado para a animação
+  const [moveAnim] = useState(new Animated.Value(0)); // Inicializa o valor da animação (posição X)
+
+  const increaseSteps = () => {
+    setSteps(steps + 100);
+    if (steps > 5000) {
+      setMood("happy");
+    } else {
+      setMood("sad");
+    }
   };
 
-  const handleChangeMlSize = (size: number) => {
-    setMlSize(size);
+  // Função para iniciar a animação do movimento
+  const startMove = () => {
+    // Animação para mover a imagem da esquerda para a direita e vice-versa
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(moveAnim, {
+          toValue: screenWidth - 250, // Subtraímos a largura da imagem para que o animal não saia da tela
+          duration: 3000, // Tempo para mover até a borda direita
+          useNativeDriver: true, // Usar o driver nativo para melhor performance
+        }),
+        Animated.timing(moveAnim, {
+          toValue: 0, // Voltar para a posição inicial (borda esquerda)
+          duration: 3000, // Tempo para voltar até a borda esquerda
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
   };
 
   useEffect(() => {
-    if (waterAmount >= goal) {
-      toast.show({
-        description: "A meta de comida foi atiginda. Parabéns!.",
-        placement: "top",
-      });
-    }
-  }, [waterAmount]);
+    startMove(); // Iniciar o movimento quando o componente for montado
+  }, []);
 
   return (
-    <>
-      <VStack
-        flex={1}
-        width="100%"
-        justifyContent="space-between"
-        alignItems="center"
-        p={4}
-        my={30}
+    <View style={styles.container}>
+      <ImageBackground
+        source={require("../../assets/fundo_vita.jpg")}
+        style={styles.backgroundImage}
       >
-        <Text fontSize="sm"> corre krl {mlSize}</Text>
-
-        <VStack>
-          <HStack alignItems="center" justifyContent="center">
-            <Text fontSize="6xl">{waterAmount}</Text>
-            <Text fontSize="xl"> / {goal}</Text>
-          </HStack>
-          <Button
-            mt={5}
-            colorScheme="primary"
-            onPress={() => {
-              handleWater();
-            }}
-          >
-            corre forest
-          </Button>
-        </VStack>
-
-        <Box mt={10}>
-          <Button.Group>
-            <Button onPress={() => handleChangeMlSize(250)} colorScheme="teal">
-              boraaaa
-            </Button>
-            <Button onPress={() => handleChangeMlSize(350)} colorScheme="teal">
-              vamooo
-            </Button>
-            <Button onPress={() => handleChangeMlSize(500)} colorScheme="teal">
-              oxi
-            </Button>
-          </Button.Group>
+        <Box display="flex">
+          <Animated.Image
+            source={petImage}
+            style={[styles.petImage, { transform: [{ translateX: moveAnim }] }]}
+          />
         </Box>
-      </VStack>
-    </>
+      </ImageBackground>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  backgroundImage: {
+    width: "100%",
+    height: "100%",
+    marginBottom: 20,
+  },
+  petImage: {
+    width: 250,
+    height: 250,
+    marginTop: 300,
+  },
+  stepsText: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  moodText: {
+    fontSize: 16,
+    color: "gray",
+  },
+});
 
 export default Vita;
