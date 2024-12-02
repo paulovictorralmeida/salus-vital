@@ -1,35 +1,27 @@
-import { Box, useToast, View } from "native-base";
+import { Box, View } from "native-base";
 import React, { useEffect, useState } from "react";
+import { useGoalContext } from "../contexts/GoalContext"; 
 import { Animated, ImageBackground, StyleSheet, Dimensions } from "react-native";
-import { Button, HStack, Text, VStack } from "native-base";
 
 interface VitaProps {}
 
 const Vita: React.FC<VitaProps> = () => {
-  const [mood, setMood] = useState("happy");
-  const [steps, setSteps] = useState(0);
+  const screenWidth = Dimensions.get("window").width;
+  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null); 
+  const { waterAmount, waterGoal, foodAmount, foodGoal, petMood, setPetMood, setWaterAmount, setFoodAmount } = useGoalContext(); 
 
   const petImage =
-    mood === "happy"
+    petMood === "happy"
       ? require("../../assets/monstro_child_happy.png")
-      : require("../../assets/monstro_child.png");
-
-  const screenWidth = Dimensions.get("window").width;
+      : petMood === "sad"
+      ? require("../../assets/monstro_child_sad.png") 
+      : require("../../assets/monstro_child.png"); 
 
   const [moveAnim] = useState(new Animated.Value(0));
 
-  const increaseSteps = () => {
-    setSteps(steps + 100);
-    if (steps > 5000) {
-      setMood("happy");
-    } else {
-      setMood("sad");
-    }
-  };
-
   const startMove = () => {
     Animated.loop(
-      Animated.sequence([
+      Animated.sequence([ 
         Animated.timing(moveAnim, {
           toValue: screenWidth - 250, 
           duration: 3000,
@@ -44,9 +36,47 @@ const Vita: React.FC<VitaProps> = () => {
     ).start();
   };
 
+  const updateMood = () => {
+    if (waterAmount >= waterGoal && foodAmount >= foodGoal) {
+      setPetMood("happy");
+      resetMoodAfterTime(6 * 60 * 60 * 1000); 
+    } 
+    else {
+      setPetMood("sad");
+      resetMoodAfterTime(6 * 60 * 60 * 1000);
+    }
+  };
+
+  const handleConsumption = () => {
+    setPetMood("happy");
+    resetMoodAfterTime(5 * 60 * 1000); 
+  };
+
+  const resetMoodAfterTime = (time: number) => {
+    if (timer) {
+      clearTimeout(timer); 
+    }
+    const newTimer = setTimeout(() => {
+      setPetMood("normal"); 
+    }, time);
+
+    setTimer(newTimer);
+  };
+
   useEffect(() => {
     startMove();
-  }, []);
+    updateMood(); 
+  }, [waterAmount, foodAmount, waterGoal, foodGoal]); 
+
+  useEffect(() => {
+    setPetMood("normal");
+  }, []); 
+
+  useEffect(() => {
+    if (waterAmount > 0 || foodAmount > 0) {
+      handleConsumption(); 
+    }
+  }, [waterAmount, foodAmount]); 
 
   return (
     <View style={styles.container}>
@@ -56,9 +86,8 @@ const Vita: React.FC<VitaProps> = () => {
       >
         <Box display="flex">
           <Animated.Image
-            source={petImage}
-            style={[styles.petImage, { transform: [{ translateX: moveAnim }] }]}
-          />
+            source={petImage} 
+            style={[styles.petImage, { transform: [{ translateX: moveAnim }] }]}/>
         </Box>
       </ImageBackground>
     </View>
@@ -71,28 +100,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
   backgroundImage: {
     width: "100%",
     height: "100%",
-    marginBottom: 20,
   },
   petImage: {
     width: 250,
     height: 250,
     marginTop: 300,
-  },
-  stepsText: {
-    fontSize: 18,
-    marginBottom: 10,
-  },
-  moodText: {
-    fontSize: 16,
-    color: "gray",
   },
 });
 
