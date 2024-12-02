@@ -86,7 +86,7 @@ const Food: React.FC = () => {
         <Slider.Thumb bg="orange.500" />
       </Slider>
 
-      <HStack>
+      <HStack space={4}>
         <Box
           backgroundColor="#E2E8F0"
           borderRadius="xl"

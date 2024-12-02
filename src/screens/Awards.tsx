@@ -5,7 +5,7 @@ interface Awards {
   title: string;
   description: string;
   date: string;
-  points: number;  // Armazenar a pontuação junto com a conquista
+  points: number;  
 }
 
 const Awards: React.FC = () => {
