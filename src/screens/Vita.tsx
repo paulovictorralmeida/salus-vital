@@ -14,11 +14,9 @@ const Vita: React.FC<VitaProps> = () => {
       ? require("../../assets/monstro_child_happy.png")
       : require("../../assets/monstro_child.png");
 
-  // Pegando a largura da tela
   const screenWidth = Dimensions.get("window").width;
 
-  // Estado para a animação
-  const [moveAnim] = useState(new Animated.Value(0)); // Inicializa o valor da animação (posição X)
+  const [moveAnim] = useState(new Animated.Value(0));
 
   const increaseSteps = () => {
     setSteps(steps + 100);
@@ -29,19 +27,17 @@ const Vita: React.FC<VitaProps> = () => {
     }
   };
 
-  // Função para iniciar a animação do movimento
   const startMove = () => {
-    // Animação para mover a imagem da esquerda para a direita e vice-versa
     Animated.loop(
       Animated.sequence([
         Animated.timing(moveAnim, {
-          toValue: screenWidth - 250, // Subtraímos a largura da imagem para que o animal não saia da tela
-          duration: 3000, // Tempo para mover até a borda direita
-          useNativeDriver: true, // Usar o driver nativo para melhor performance
+          toValue: screenWidth - 250, 
+          duration: 3000,
+          useNativeDriver: true, 
         }),
         Animated.timing(moveAnim, {
-          toValue: 0, // Voltar para a posição inicial (borda esquerda)
-          duration: 3000, // Tempo para voltar até a borda esquerda
+          toValue: 0,
+          duration: 3000, 
           useNativeDriver: true,
         }),
       ])
@@ -49,7 +45,7 @@ const Vita: React.FC<VitaProps> = () => {
   };
 
   useEffect(() => {
-    startMove(); // Iniciar o movimento quando o componente for montado
+    startMove();
   }, []);
 
   return (
